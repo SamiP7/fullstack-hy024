@@ -34,12 +34,13 @@ const App = () => {
 
   return (
     <>
-    <div>
-      {anecdotes[selected]}
-    </div>
-    <div>
-      has {anecdote_votes[selected]} votes
-    </div>
+    <Header
+      text='Anecdote of the day'
+    />
+    <Anecdote
+      text={anecdotes[selected]}
+      votes={anecdote_votes[selected]}
+    />
     <Button
       handleClick={vote_anecdote}
       text='vote'
@@ -48,10 +49,53 @@ const App = () => {
       handleClick={selectAnecdote}
       text='next anecdote'
     />
+    <MostVotes
+      header_text = 'Anecdote with most votes'
+      votes = {anecdote_votes}
+      anecdotes={anecdotes}
+    />
     </>
   )
 }
 
+const MostVotes = ({header_text, votes, anecdotes}) => {
+  let sum = 0
+  votes.forEach((e1) => sum += e1)
+  if (sum > 0) {
+    let most_votes = 0
+    for (let i = 0; i < votes.length; i++) {
+      if (votes[i] > votes[most_votes]) {
+        most_votes = i
+      }
+    }
+    return (
+      <>
+      <Header
+        text={header_text}
+      />
+      <Anecdote
+        text={anecdotes[most_votes]}
+        votes={votes[most_votes]}
+      />
+      </>
+    )
+  }
+}
+
+const Anecdote = ({text, votes}) => {
+  return (
+    <>
+    <div>{text}</div>
+    <div>has {votes} votes</div>
+    </>
+  )
+}
+
+const Header = ({text}) => {
+  return (
+    <h1> {text} </h1>
+  )
+}
 const Button = ({handleClick, text}) => {
   return (
     <button onClick={handleClick}>
