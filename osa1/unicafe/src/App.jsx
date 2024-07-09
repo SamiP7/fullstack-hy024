@@ -33,12 +33,6 @@ const App = () => {
     setPositive(good/updatedTotal)
   }
 
-  const changeToPercentage = (value) => {
-    const newValue = value * 100
-    return (
-      newValue + ' %'
-    )
-  }
   return (
     <div>
       <Header 
@@ -59,29 +53,13 @@ const App = () => {
       <Header 
         header='statistics'
       />
-      <Display
-       text='good'
-       stats={good}
-      />
-      <Display
-       text='neutral'
-       stats={neutral}
-      />
-      <Display
-       text='bad'
-       stats={bad}
-      />
-      <Display
-       text='all'
-       stats={total}
-      />
-      <Display
-       text='average'
-       stats={average}
-      />
-      <Display
-       text='positive'
-       stats= {changeToPercentage(positive)}
+      <Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        all={total}
+        average={average}
+        positive={positive}
       />
     </div>
   )
@@ -89,9 +67,21 @@ const App = () => {
 
 const Header = ({ header }) => {return (<h1>{header}</h1>)}
 
-const Display = ({text, stats}) => {
-  return (
-    <div>{text} {stats}</div>
+const Statistics = (props) => {
+  if (props.all === 0) {
+    return (
+      <div>No feedback given</div>
+    )
+  }
+  return(
+    <>
+      <div>good {props.good}</div>
+      <div>neutral {props.neutral}</div>
+      <div>bad {props.bad}</div>
+      <div>all {props.all}</div>
+      <div>average {props.average}</div>
+      <div>positive {props.positive * 100} %</div>
+    </>
   )
 }
 
