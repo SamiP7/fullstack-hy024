@@ -67,20 +67,31 @@ const App = () => {
 
 const Header = ({ header }) => {return (<h1>{header}</h1>)}
 
+const StatisticLine = ({text, value}) => {
+  if (text === 'positive') {
+    return (
+      <div>{text} {value * 100} %</div>
+    )
+  }
+  return (
+    <div>{text} {value}</div>
+  )
+}
+
 const Statistics = (props) => {
   if (props.all === 0) {
     return (
       <div>No feedback given</div>
     )
   }
-  return(
+  return (
     <>
-      <div>good {props.good}</div>
-      <div>neutral {props.neutral}</div>
-      <div>bad {props.bad}</div>
-      <div>all {props.all}</div>
-      <div>average {props.average}</div>
-      <div>positive {props.positive * 100} %</div>
+      <StatisticLine text='good' value={props.good} />
+      <StatisticLine text='neutral' value={props.neutral} />
+      <StatisticLine text='bad' value={props.bad} />
+      <StatisticLine text='all' value={props.all} />
+      <StatisticLine text='average' value={props.average} />
+      <StatisticLine text='positive' value={props.positive}/>
     </>
   )
 }
