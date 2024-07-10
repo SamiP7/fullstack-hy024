@@ -1,11 +1,4 @@
-import Content from './components/Content'
-import Header from './components/Header'
-import Total from './components/Total'
 import Course from './components/Course'
-
-
-
-
 
 const App = () => {
   const course = {
@@ -33,7 +26,6 @@ const App = () => {
   return (
     <div>
       <Course course={course}/>
-      
     </div>
   )
 }
