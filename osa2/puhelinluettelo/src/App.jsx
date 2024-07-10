@@ -28,8 +28,6 @@ const App = () => {
     }
   }
 
-  const personsToShow = persons.filter(person => person.hide === false)
-
   const addPerson = (event) => {
     event.preventDefault()
     const personObject ={
@@ -46,50 +44,40 @@ const App = () => {
     } else {
       alert(`${newName} is already added to phonebook`)
     }
-
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-      filter shown with
-      <input
-      value={showFiltered}
-      onChange={handleFiltering}
-      />
-      </div>
+      <Filter
+        show={showFiltered}
+        change={handleFiltering}
+        />
       <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: 
-          <input 
-          value={newName}
-          onChange={handlePersonChange}
-          />
-        </div>
-        <div>
-          phonenumber:
-          <input
-          value={newNumber}
-          onChange={handleNumberChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+        <PersonForm
+          addPerson={addPerson}
+          name={newName} nameFunction={handlePersonChange}
+          number={newNumber} numberFunction={handleNumberChange}
+        />
       <h2>Numbers</h2>
-      <ul>
-        {personsToShow.map(person =>
+      <Number
+        persons={persons}
+      />
+    </div>
+  )
+}
+
+const Number = ({persons}) => {
+  const personsToShow = persons.filter(person => person.hide === false)
+  return (
+    <ul>
+      {personsToShow.map(person =>
           <Person key={person.name}
             person={person}
           />
         )}
-      </ul>
-    </div>
+    </ul>
   )
-
 }
 
 const Person = ({person}) => {
@@ -97,6 +85,40 @@ const Person = ({person}) => {
     <div>
     {person.name} {person.number}
     </div>
+  )
+}
+
+const Filter = ({show, change}) => {
+  return (
+    <div>
+      filter shown with
+      <input
+      value={show}
+      onChange={change}
+      />
+    </div>
+  )
+}
+
+const PersonForm = ({addPerson, name, nameFunction, number, numberFunction}) => {
+  return (
+    <form onSubmit={addPerson}>
+      <div>
+      name: 
+      <input 
+      value={name}
+      onChange={nameFunction}
+      />
+      phonenumber:
+      <input
+      value={number}
+      onChange={numberFunction}
+      />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
   )
 }
 
