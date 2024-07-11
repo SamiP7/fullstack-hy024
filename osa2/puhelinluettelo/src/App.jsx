@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -7,14 +8,12 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [showFiltered, setShowFiltered] = useState('')
 
-  const hook = () => {
-    axios.get('http://localhost:3001/persons')
+  useEffect(() => {
+    personService.getAll()
     .then(response => {
       setPersons(response.data)
     })
-  }
-
-  useEffect(hook, [])
+  }, [])
 
   const handlePersonChange = (event) => {
     setNewName(event.target.value)
@@ -29,21 +28,40 @@ const App = () => {
     setShowFiltered(updatedValue)
   }
 
+  const deletePerson = id => {
+    const nameP = persons.find(p => p.id === id)
+    if (confirm(`Delete ${nameP.name} ?`)) {
+      personService.deleteIndividual(id)
+      setPersons(persons.filter(p => p.id !== id))
+    }
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
     const personObject ={
       name: newName,
       number: newNumber,
-      hide: false,
     }
     
     if (!persons.some(i => i.name === personObject.name)) {
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
-      
+      personService.create(personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewNumber('')
+      })
     } else {
-      alert(`${newName} is already added to phonebook`)
+      if (confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const person = persons.find(p => p.name === personObject.name)
+        const changedPerson = {...person, number: personObject.number}
+
+        personService.update(person.id, changedPerson)
+        .then(response => {
+          setPersons(persons.map(p => p.id !== person.id ? p : response.data))
+        })
+      }
+        setNewName('')
+        setNewNumber('')
     }
   }
 
@@ -64,28 +82,31 @@ const App = () => {
       <Number
         persons={persons}
         filter={showFiltered}
+        deletePersonFunction={deletePerson}
       />
     </div>
   )
 }
 
-const Number = ({persons, filter}) => {
+const Number = ({persons, filter, deletePersonFunction}) => {
   const personsToShow = persons.filter(person => person.name.includes(filter))
   return (
     <ul>
       {personsToShow.map(person =>
           <Person key={person.name}
             person={person}
+            deleteThisPerson={() => deletePersonFunction(person.id)}
           />
         )}
     </ul>
   )
 }
 
-const Person = ({person}) => {
+const Person = ({person, deleteThisPerson}) => {
   return (
     <div>
     {person.name} {person.number}
+    <button onClick={deleteThisPerson}>delete</button>
     </div>
   )
 }
