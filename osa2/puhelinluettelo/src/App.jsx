@@ -1,12 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '+142 151 242 12', hide: false }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [showFiltered, setShowFiltered] = useState('')
+
+  const hook = () => {
+    axios.get('http://localhost:3001/persons')
+    .then(response => {
+      setPersons(response.data)
+    })
+  }
+
+  useEffect(hook, [])
 
   const handlePersonChange = (event) => {
     setNewName(event.target.value)
@@ -19,13 +27,6 @@ const App = () => {
   const handleFiltering = (event) => {
     const updatedValue = event.target.value
     setShowFiltered(updatedValue)
-    for (let i = 0; i < persons.length; i++) {
-      if (!persons[i].name.includes(updatedValue)) {
-          persons[i].hide = true
-      } else {
-        persons[i].hide = false
-      }
-    }
   }
 
   const addPerson = (event) => {
@@ -62,13 +63,14 @@ const App = () => {
       <h2>Numbers</h2>
       <Number
         persons={persons}
+        filter={showFiltered}
       />
     </div>
   )
 }
 
-const Number = ({persons}) => {
-  const personsToShow = persons.filter(person => person.hide === false)
+const Number = ({persons, filter}) => {
+  const personsToShow = persons.filter(person => person.name.includes(filter))
   return (
     <ul>
       {personsToShow.map(person =>
