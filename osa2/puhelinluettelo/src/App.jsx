@@ -7,11 +7,21 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [showFiltered, setShowFiltered] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState('')
+  const [errorBoolean, setErrorBoolean] = useState(false)
 
   useEffect(() => {
     personService.getAll()
     .then(response => {
       setPersons(response.data)
+    })
+    .catch(error => {
+      setErrorBoolean(true)
+      setNotificationMessage(`Failed to retrieve numbers from server`)
+      console.log(error)
+      setTimeout(() => {
+        setNotificationMessage('')
+      }, 5000)
     })
   }, [])
 
@@ -32,7 +42,20 @@ const App = () => {
     const nameP = persons.find(p => p.id === id)
     if (confirm(`Delete ${nameP.name} ?`)) {
       personService.deleteIndividual(id)
+      .catch(error => {
+        setErrorBoolean(true)
+        setNotificationMessage(`${nameP.name} has already been deleted`)
+        console.log(error)
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
+      })
       setPersons(persons.filter(p => p.id !== id))
+      setErrorBoolean(false)
+      setNotificationMessage(`Deleted ${nameP.name}`)
+      setTimeout(() => {
+        setNotificationMessage('')
+      }, 5000)
     }
   }
 
@@ -50,6 +73,19 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
+      .catch(error => {
+        setErrorBoolean(true)
+        setNotificationMessage(`Failed to add ${personObject.name}`)
+        setTimeout(() => {
+          setNotificationMessage('')
+        }, 5000)
+      })
+
+      setErrorBoolean(false)
+      setNotificationMessage(`Added ${personObject.name}`)
+      setTimeout(() => {
+        setNotificationMessage('')
+      }, 5000)
     } else {
       if (confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
         const person = persons.find(p => p.name === personObject.name)
@@ -59,6 +95,19 @@ const App = () => {
         .then(response => {
           setPersons(persons.map(p => p.id !== person.id ? p : response.data))
         })
+        .catch(error => {
+          setErrorBoolean(true)
+          setNotificationMessage(`Information of ${personObject.name} has already been deleted`)
+          setTimeout(() => {
+            setNotificationMessage('')
+          }, 5000)
+        })
+
+          setErrorBoolean(false)
+          setNotificationMessage(`Changed ${personObject.name}'s number`)
+          setTimeout(() => {
+            setNotificationMessage('')
+          }, 5000)
       }
         setNewName('')
         setNewNumber('')
@@ -68,6 +117,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} error={errorBoolean}/>
       <Filter
         show={showFiltered}
         change={handleFiltering}
@@ -143,6 +193,46 @@ const PersonForm = ({addPerson, name, nameFunction, number, numberFunction}) => 
       </div>
     </form>
   )
+}
+
+const Notification = ({ message, error }) => {
+  const successStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+  const errorStyle = {
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  if (message === '') {
+    return null
+  }
+  if (error) {
+    return (
+      <div style={errorStyle}>
+        {message}
+    </div>
+    )
+  }
+
+  return (
+    <div style={successStyle}>
+      {message}
+    </div>
+  )
+
+  
 }
 
 export default App
