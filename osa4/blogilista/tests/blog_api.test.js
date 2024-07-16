@@ -109,6 +109,31 @@ test('blog without author and likes is added', async() => {
     assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
 })
 
+test('deleting a blog succeeds if id is valid', async() => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[1]
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+    
+    const blogsAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+    assert(!blogsAtEnd.includes(blogToDelete))
+})
+
+test('deleting a blog fails if id is invalid', async() => {
+    const blogToDelete = 'notvalidid'
+
+    await api
+        .delete(`/api/blogs/${blogToDelete}`)
+        .expect(400)
+    
+    const blogsAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+})
 
 after(async () => {
   await mongoose.connection.close()
