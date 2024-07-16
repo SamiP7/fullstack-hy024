@@ -48,6 +48,38 @@ test('blog can be added with api call', async () => {
 
 })
 
+test('blog without title is not added', async() => {
+    const newBlog = {
+        author: 'Different Edsger W. Dijkstra',
+        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
+})
+
+test('blog without url is not added', async() => {
+    const newBlog = {
+        title: 'Go To Statement Considered Harmful',
+        author: 'Different Edsger W. Dijkstra'
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
+})
+
 test('new blogs default likes are 0 if no value given', async () => {
     const newBlog = {
         title: 'Go To Statement Considered Harmful',
@@ -60,6 +92,23 @@ test('new blogs default likes are 0 if no value given', async () => {
 
     assert.strictEqual(createdBlog.likes, 0)
 })
+
+test('blog without author and likes is added', async() => {
+    const newBlog = {
+        title: 'Go To Statement Considered Harmful',
+        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
+})
+
 
 after(async () => {
   await mongoose.connection.close()
