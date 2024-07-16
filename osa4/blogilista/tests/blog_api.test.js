@@ -25,6 +25,29 @@ test('blogs identifier returned in correct form', async () => {
     assert(response.body.every(b => b.hasOwnProperty('id')))
 })
 
+test('blog can be added with api call', async () => {
+    const newBlog = {
+        title: 'Go To Statement Considered Harmful',
+        author: 'Different Edsger W. Dijkstra',
+        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+        likes: 5
+    }  
+    
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+
+    const response = await api.get('/api/blogs')
+
+    const author = response.body.map(r => r.author)
+    
+    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1)
+
+    assert(author.includes('Different Edsger W. Dijkstra'))
+
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
