@@ -135,6 +135,42 @@ test('deleting a blog fails if id is invalid', async() => {
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
+test('updating likes of a blog if id is valid', async() => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[1]
+    const updatedBlog = {
+        title: blogToUpdate.title,
+        author: blogToUpdate.author,
+        url: blogToUpdate.url,
+        likes: blogToUpdate.likes + 10
+    }
+
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+    
+    const blogsAtEnd = await helper.blogsInDb()
+    const resultedBlog = blogsAtEnd[1]
+    
+    assert.strictEqual(resultedBlog.likes, blogToUpdate.likes + 10)
+})
+
+test('updating likes of a blog if id is invalid', async() => {
+    const blogToUpdate = 'notvalidid'
+    const updatedBlog = {
+        title: blogToUpdate.title,
+        author: blogToUpdate.author,
+        url: blogToUpdate.url,
+        likes: blogToUpdate.likes + 10
+    }
+
+    await api
+        .put(`/api/blogs/${blogToUpdate}`)
+        .send(updatedBlog)
+        .expect(400)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
