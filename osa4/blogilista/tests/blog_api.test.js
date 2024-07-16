@@ -13,10 +13,16 @@ beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
 })
+
 test('correct amount of blogs at initialization', async () => {
   const response = await api.get('/api/blogs')
 
   assert.strictEqual(response.body.length, 6)
+})
+
+test('blogs identifier returned in correct form', async () => {
+    const response = await api.get('/api/blogs')
+    assert(response.body.every(b => b.hasOwnProperty('id')))
 })
 
 after(async () => {
