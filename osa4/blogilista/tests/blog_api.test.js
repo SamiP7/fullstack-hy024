@@ -48,6 +48,19 @@ test('blog can be added with api call', async () => {
 
 })
 
+test('new blogs default likes are 0 if no value given', async () => {
+    const newBlog = {
+        title: 'Go To Statement Considered Harmful',
+        author: 'Different Edsger W. Dijkstra',
+        url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+    }
+
+    await Blog.create(newBlog)
+    const createdBlog = await Blog.findOne(newBlog)
+
+    assert.strictEqual(createdBlog.likes, 0)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
