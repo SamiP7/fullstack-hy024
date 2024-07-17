@@ -1,5 +1,8 @@
 const Note = require('../models/blog')
 const User = require('../models/user')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
 
 const initialUsers = [
   {
@@ -75,6 +78,24 @@ const usersInDb = async () => {
   return users.map(user => user.toJSON())
 }
 
+const userLoginInfo = async () => {
+  const user = {
+    username: 'blaa',
+    password: 'blaa2'
+  }
+  try {
+    await api.post('/api/users')
+        .send(user)
+
+    const response = await api.post('/api/login').send(user)
+    
+    return response.body
+
+  } catch(error) {
+    console.error('error', error)
+  }
+}
+
 module.exports = {
-  initialBlogs, blogsInDb, usersInDb, initialUsers
+  initialBlogs, blogsInDb, usersInDb, initialUsers, userLoginInfo
 }
