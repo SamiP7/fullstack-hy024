@@ -14,9 +14,7 @@ blogsRouter.post('/', async (request, response, next) => {
     const body = request.body
     try {
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
-        if (!decodedToken.id) {
-            return response.status(401).json({error:'token invalid'})
-        }
+        
         const user = await User.findById(decodedToken.id)
 
         const blog = new Blog({
@@ -38,8 +36,17 @@ blogsRouter.post('/', async (request, response, next) => {
 
 blogsRouter.delete('/:id', async (request, response, next) => {
     try {
-        await Blog.findByIdAndDelete(request.params.id)
-        response.status(204).end()
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+        const user = await User.findById(decodedToken.id)
+        const blog = await Blog.findById(request.params.id)
+        if (user.id.toString() === blog.user.toString()) {
+            await Blog.findByIdAndDelete(request.params.id)
+            response.status(204).end()
+        } else {
+            response.status(401).json({ error: 'note can only deleted by their creator'})
+        }
+        
     } catch(exception) {
         next(exception)
     }
