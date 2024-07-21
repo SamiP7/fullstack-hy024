@@ -9,3 +9,5 @@
 [link to exercises](https://github.com/SamiP7/fullstack-hy024-part3)
 ## part 4
 [link to exercises](https://github.com/SamiP7/fullstack-hy024/tree/main/osa4/blogilista)
+## part 5
+[link to exercises](https://github.com/SamiP7/fullstack-hy024/tree/main/osa5)
